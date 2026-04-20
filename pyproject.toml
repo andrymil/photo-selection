@@ -13,6 +13,7 @@ dependencies = [
     "lightning>=2.6.1",
     "matplotlib>=3.10.8",
     "numpy>=2.4.3",
+    "opencv-python>=4.13.0.92",
     "pandas>=3.0.1",
     "pillow>=12.1.1",
     "scikit-learn>=1.8.0",
@@ -23,6 +24,7 @@ dependencies = [
     "torchvision>=0.25.0",
     "torchviz>=0.0.3",
     "tqdm>=4.67.3",
+    "ultralytics>=8.4.33",
     "wandb>=0.25.1",
 ]
 
@@ -35,3 +37,17 @@ explicit = true
 torch = { index = "pytorch-cu130" }
 torchvision = { index = "pytorch-cu130" }
 torchaudio = { index = "pytorch-cu130" }
+
+[tool.mypy]
+[[tool.mypy.overrides]]
+module = [
+    "sklearn.*",
+    "pandas.*",
+    "cv2.*",
+    "tqdm.*",
+    "torchvision.*",
+    "seaborn.*",
+    "torchviz.*",
+    "ipympl.*"
+]
+ignore_missing_imports = true
