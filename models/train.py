@@ -14,8 +14,8 @@ from utils.path import calculate_path
 from utils.model import get_resnet18, get_standard_transforms
 
 
-EXPERIMENT_NAME = "ResNet18_224px_batch32"
-BASE_DIR = "datasets"
+EXPERIMENT_NAME = "ResNet18_ROI_224px_batch32_allParams"
+BASE_DIR = "datasets_roi"
 
 
 class BlurDataset(Dataset):
@@ -62,14 +62,14 @@ def main():
 
     model = get_resnet18(DEVICE, eval_mode=False)
 
-    for name, param in model.named_parameters():
-        if "fc" not in name:
-            param.requires_grad = False
+    # for name, param in model.named_parameters():
+    #     if "fc" not in name:
+    #         param.requires_grad = False
 
     weights = torch.tensor([1.0, weight_for_class_1], dtype=torch.float32).to(DEVICE)
     criterion = nn.CrossEntropyLoss(weight=weights)
 
-    optimizer = optim.Adam(model.fc.parameters(), lr=0.0001)
+    optimizer = optim.Adam(model.parameters(), lr=1e-5)
 
     metric_collection = torchmetrics.MetricCollection(
         [
@@ -81,7 +81,7 @@ def main():
     ).to(DEVICE)
 
     history = []
-    EPOCHS = 5
+    EPOCHS = 10
     print("\nStarting training...")
 
     for epoch in range(EPOCHS):
