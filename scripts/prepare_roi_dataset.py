@@ -1,12 +1,17 @@
 import cv2
+import shutil
 from pathlib import Path
 from tqdm import tqdm
 from ultralytics import YOLO
 from utils.data import prepare_dataset
-from utils.vision import get_largest_bbox
+from utils.vision import get_smart_bbox
 
 BASE_DIR = "datasets"
 TARGET_DIR = "datasets_roi"
+
+if Path(TARGET_DIR).exists():
+    print(f"Cleaning old directory {TARGET_DIR}...")
+    shutil.rmtree(TARGET_DIR)
 
 print("Loading YOLOv8...")
 yolo = YOLO("models/pretrained/yolov8n.pt")
@@ -25,7 +30,7 @@ for img_path in tqdm(paths):
         continue
 
     yolo_results = yolo(img_cv2, verbose=False)[0]
-    bbox = get_largest_bbox(yolo_results, img_cv2.shape)
+    bbox = get_smart_bbox(yolo_results, img_cv2.shape)
 
     if bbox:
         x1, y1, x2, y2 = bbox

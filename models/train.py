@@ -12,10 +12,11 @@ from utils.seed import set_seed
 from utils.data import prepare_dataset
 from utils.path import calculate_path
 from utils.model import get_resnet18, get_standard_transforms
+from utils.plot import plot_training_history
 
 
-EXPERIMENT_NAME = "ResNet18_ROI_224px_batch32_allParams"
-BASE_DIR = "datasets_roi"
+EXPERIMENT_NAME = "ResNet18_224px_batch32"
+BASE_DIR = "datasets"
 
 
 class BlurDataset(Dataset):
@@ -61,10 +62,6 @@ def main():
     }
 
     model = get_resnet18(DEVICE, eval_mode=False)
-
-    # for name, param in model.named_parameters():
-    #     if "fc" not in name:
-    #         param.requires_grad = False
 
     weights = torch.tensor([1.0, weight_for_class_1], dtype=torch.float32).to(DEVICE)
     criterion = nn.CrossEntropyLoss(weight=weights)
@@ -148,6 +145,9 @@ def main():
     csv_filename = results_path / f"{EXPERIMENT_NAME}.csv"
     df.to_csv(csv_filename, index=False)
     print(f"Metrics saved to {csv_filename}")
+
+    plot_filename = results_path / f"{EXPERIMENT_NAME}_plot.png"
+    plot_training_history(df, plot_filename)
 
     checkpoint_filename = checkpoints_path / f"{EXPERIMENT_NAME}.pth"
     torch.save(model.state_dict(), checkpoint_filename)
