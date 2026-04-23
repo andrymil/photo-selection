@@ -11,11 +11,11 @@ from sklearn.model_selection import train_test_split
 from utils.seed import set_seed
 from utils.data import prepare_dataset
 from utils.path import calculate_path
-from utils.model import get_resnet18, get_standard_transforms
+from utils.model import get_efficientnet, get_train_transforms, get_val_transforms
 from utils.plot import plot_training_history
 
 
-EXPERIMENT_NAME = "ResNet18_224px_batch32"
+EXPERIMENT_NAME = "EfficientNetV2S_384px_batch16_tuned"
 BASE_DIR = "datasets"
 
 
@@ -50,23 +50,27 @@ def main():
         paths, labels, test_size=0.2, random_state=42, stratify=labels
     )
 
-    transform = get_standard_transforms()
+    train_transform = get_train_transforms(img_size=384)
+    val_transform = get_val_transforms(img_size=384)
 
-    train_dataset = BlurDataset(train_paths, train_labels, transform=transform)
-    val_dataset = BlurDataset(val_paths, val_labels, transform=transform)
+    train_dataset = BlurDataset(train_paths, train_labels, transform=train_transform)
+    val_dataset = BlurDataset(val_paths, val_labels, transform=val_transform)
 
     dataset_sizes = {"train": len(train_dataset), "val": len(val_dataset)}
     dataloaders = {
-        "train": DataLoader(train_dataset, batch_size=32, shuffle=True),
-        "val": DataLoader(val_dataset, batch_size=32, shuffle=False),
+        "train": DataLoader(train_dataset, batch_size=16, shuffle=True),
+        "val": DataLoader(val_dataset, batch_size=16, shuffle=False),
     }
 
-    model = get_resnet18(DEVICE, eval_mode=False)
+    model = get_efficientnet(DEVICE, eval_mode=False)
 
     weights = torch.tensor([1.0, weight_for_class_1], dtype=torch.float32).to(DEVICE)
     criterion = nn.CrossEntropyLoss(weight=weights)
 
-    optimizer = optim.Adam(model.parameters(), lr=1e-5)
+    optimizer = optim.AdamW(model.parameters(), lr=1e-5, weight_decay=1e-4)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode="min", factor=0.5, patience=2
+    )
 
     metric_collection = torchmetrics.MetricCollection(
         [
@@ -79,6 +83,11 @@ def main():
 
     history = []
     EPOCHS = 10
+    best_val_f1 = 0.0
+
+    checkpoints_path = calculate_path(__file__, "checkpoints")
+    checkpoints_path.mkdir(parents=True, exist_ok=True)
+
     print("\nStarting training...")
 
     for epoch in range(EPOCHS):
@@ -123,6 +132,16 @@ def main():
                 f"Recall: {total_metrics['BinaryRecall']:.4f} | Prec: {total_metrics['BinaryPrecision']:.4f}"
             )
 
+            if phase == "val":
+                scheduler.step(epoch_loss)
+
+                current_f1 = total_metrics["BinaryF1Score"].item()
+                if current_f1 > best_val_f1:
+                    best_val_f1 = current_f1
+                    best_model_path = checkpoints_path / f"{EXPERIMENT_NAME}_BEST.pth"
+                    torch.save(model.state_dict(), best_model_path)
+                    print("New best F1-Score! Model saved.")
+
             history.append(
                 {
                     "epoch": epoch + 1,
@@ -135,11 +154,10 @@ def main():
                 }
             )
 
+    print(f"Best val F1 score: {best_val_f1:.4f}")
     print("\nTraining complete! Saving results...")
 
     results_path = calculate_path(__file__)
-    checkpoints_path = calculate_path(__file__, "checkpoints")
-    checkpoints_path.mkdir(parents=True, exist_ok=True)
 
     df = pd.DataFrame(history)
     csv_filename = results_path / f"{EXPERIMENT_NAME}.csv"
@@ -149,7 +167,7 @@ def main():
     plot_filename = results_path / f"{EXPERIMENT_NAME}_plot.png"
     plot_training_history(df, plot_filename)
 
-    checkpoint_filename = checkpoints_path / f"{EXPERIMENT_NAME}.pth"
+    checkpoint_filename = checkpoints_path / f"{EXPERIMENT_NAME}_LAST.pth"
     torch.save(model.state_dict(), checkpoint_filename)
     print(f"Model weights saved to {checkpoint_filename}")
 
