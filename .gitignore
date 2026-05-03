@@ -11,3 +11,9 @@ wheels/
 
 datasets/
 datasets_roi/
+models/checkpoints/
+
+*.pth
+*.pt
+*.h5
+*.onnx
