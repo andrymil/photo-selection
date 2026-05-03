@@ -9,20 +9,11 @@ def prepare_dataset(base_dir):
 
     blur_nat_paths = glob.glob(f"{base_dir}/CERTH/TrainingSet/Naturally-Blurred/*.*")
     blur_art_paths = glob.glob(f"{base_dir}/CERTH/TrainingSet/Artificially-Blurred/*.*")
-    eval_blur_nat_paths = glob.glob(
-        f"{base_dir}/CERTH/EvaluationSet/NaturalBlurSet/*.*"
-    )
     eval_blur_dig_paths = glob.glob(
         f"{base_dir}/CERTH/EvaluationSet/DigitalBlurSet/*.*"
     )
     motion_blur = glob.glob(f"{base_dir}/CUHK/blurred/*.*")
-    class_1_paths = (
-        blur_nat_paths
-        + blur_art_paths
-        + eval_blur_nat_paths
-        + eval_blur_dig_paths
-        + motion_blur
-    )
+    class_1_paths = blur_nat_paths + blur_art_paths + eval_blur_dig_paths + motion_blur
     class_1_labels = [1] * len(class_1_paths)
 
     all_paths = class_0_paths + class_1_paths

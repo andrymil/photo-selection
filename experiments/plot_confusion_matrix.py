@@ -1,6 +1,7 @@
 import torch
 import matplotlib.pyplot as plt
 import seaborn as sns
+from pathlib import Path
 from sklearn.metrics import confusion_matrix
 from PIL import Image
 from tqdm import tqdm
@@ -9,9 +10,10 @@ from sklearn.model_selection import train_test_split
 from utils.seed import set_seed
 from utils.data import prepare_dataset
 from utils.path import calculate_path
-from utils.model import get_resnet18, get_standard_transforms, predict_ai
+from utils.model import get_efficientnet, get_val_transforms, predict_ai
 
-EXPERIMENT_GLOBAL = "ResNet18_224px_batch32"
+IMAGE_SIZE = 384
+EXPERIMENT = "EfficientNetV2S_384px_batch16_without_NaturalBlur_BEST"
 BASE_DIR = "datasets"
 
 
@@ -24,11 +26,13 @@ def main():
         paths, labels, test_size=0.2, random_state=42, stratify=labels
     )
 
-    print("Loading Global AI...")
-    model = get_resnet18(
-        DEVICE, weights_path=f"models/checkpoints/{EXPERIMENT_GLOBAL}.pth"
-    )
-    transform = get_standard_transforms()
+    print("Loading model...")
+
+    checkpoints_path = Path("models/checkpoints")
+    weights_path = checkpoints_path / f"{EXPERIMENT}.pth"
+
+    model = get_efficientnet(DEVICE, weights_path=str(weights_path))
+    transform = get_val_transforms(img_size=IMAGE_SIZE)
 
     y_pred = []
     print("Generating predictions for the confusion matrix...")
@@ -51,13 +55,13 @@ def main():
         yticklabels=["Sharp (0)", "Blurred (1)"],
     )
 
-    plt.title("Confusion Matrix - Global AI (ResNet18)", fontsize=15, pad=15)
+    plt.title("Confusion Matrix", fontsize=15, pad=15)
     plt.xlabel("Model prediction", fontsize=13, fontweight="bold")
     plt.ylabel("Real class", fontsize=13, fontweight="bold")
     plt.tight_layout()
 
     results_path = calculate_path(__file__)
-    path = results_path / "confusion_matrix_global_ai.png"
+    path = results_path / f"{EXPERIMENT}_CM.png"
     plt.savefig(path, dpi=300)
     print(f"Saved confusion matrix to: {path}")
     plt.show()
