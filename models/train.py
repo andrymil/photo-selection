@@ -14,8 +14,14 @@ from utils.path import calculate_path
 from utils.model import get_efficientnet, get_train_transforms, get_val_transforms
 from utils.plot import plot_training_history
 
+IMAGE_SIZE = 384
+BATCH_SIZE = 16
+ACCUMULATION_STEPS = 1
+VIRTUAL_BATCH_SIZE = BATCH_SIZE * ACCUMULATION_STEPS
 
-EXPERIMENT_NAME = "EfficientNetV2S_384px_batch16_tuned"
+EXPERIMENT_NAME = (
+    f"EfficientNetV2S_{IMAGE_SIZE}px_batch{VIRTUAL_BATCH_SIZE}_without_NaturalBlur"
+)
 BASE_DIR = "datasets"
 
 
@@ -50,16 +56,16 @@ def main():
         paths, labels, test_size=0.2, random_state=42, stratify=labels
     )
 
-    train_transform = get_train_transforms(img_size=384)
-    val_transform = get_val_transforms(img_size=384)
+    train_transform = get_train_transforms(img_size=IMAGE_SIZE)
+    val_transform = get_val_transforms(img_size=IMAGE_SIZE)
 
     train_dataset = BlurDataset(train_paths, train_labels, transform=train_transform)
     val_dataset = BlurDataset(val_paths, val_labels, transform=val_transform)
 
     dataset_sizes = {"train": len(train_dataset), "val": len(val_dataset)}
     dataloaders = {
-        "train": DataLoader(train_dataset, batch_size=16, shuffle=True),
-        "val": DataLoader(val_dataset, batch_size=16, shuffle=False),
+        "train": DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True),
+        "val": DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False),
     }
 
     model = get_efficientnet(DEVICE, eval_mode=False)
@@ -103,11 +109,13 @@ def main():
             running_loss = 0.0
             metric_collection.reset()
 
-            for inputs, labels in tqdm(
-                dataloaders[phase], desc=f"{phase.capitalize()} phase"
+            for i, (inputs, labels) in enumerate(
+                tqdm(dataloaders[phase], desc=f"{phase.capitalize()} phase")
             ):
                 inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
-                optimizer.zero_grad()
+
+                if phase == "train" and i % ACCUMULATION_STEPS == 0:
+                    optimizer.zero_grad()
 
                 with torch.set_grad_enabled(phase == "train"):
                     outputs = model(inputs)
@@ -115,10 +123,19 @@ def main():
                     loss = criterion(outputs, labels)
 
                     if phase == "train":
+                        loss = loss / ACCUMULATION_STEPS
                         loss.backward()
-                        optimizer.step()
 
-                running_loss += loss.item() * inputs.size(0)
+                        if (i + 1) % ACCUMULATION_STEPS == 0 or (i + 1) == len(
+                            dataloaders[phase]
+                        ):
+                            optimizer.step()
+
+                running_loss += (
+                    loss.item() * ACCUMULATION_STEPS
+                    if phase == "train"
+                    else loss.item()
+                ) * inputs.size(0)
                 metric_collection.update(preds, labels)
 
             epoch_loss = running_loss / dataset_sizes[phase]
@@ -154,7 +171,7 @@ def main():
                 }
             )
 
-    print(f"Best val F1 score: {best_val_f1:.4f}")
+    print(f"\nBest val F1 score: {best_val_f1:.4f}")
     print("\nTraining complete! Saving results...")
 
     results_path = calculate_path(__file__)
