@@ -20,7 +20,7 @@ ACCUMULATION_STEPS = 1
 VIRTUAL_BATCH_SIZE = BATCH_SIZE * ACCUMULATION_STEPS
 
 EXPERIMENT_NAME = (
-    f"EfficientNetV2S_{IMAGE_SIZE}px_batch{VIRTUAL_BATCH_SIZE}_better_dataset"
+    f"EfficientNetV2S_{IMAGE_SIZE}px_batch{VIRTUAL_BATCH_SIZE}_with_kaggle"
 )
 BASE_DIR = "datasets"
 

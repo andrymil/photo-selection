@@ -4,6 +4,7 @@ import os
 
 def prepare_dataset(base_dir):
     sharp_paths = sorted(glob.glob(f"{base_dir}/CERTH/TrainingSet/Undistorted/*.*"))
+    kaggle_sharp_paths = sorted(glob.glob(f"{base_dir}/Kaggle/sharp/*.*"))
     bokeh_paths = sorted(glob.glob(f"{base_dir}/CUHK/sharp/*.*"))
 
     all_eval_dig_paths = sorted(
@@ -20,7 +21,7 @@ def prepare_dataset(base_dir):
         else:
             eval_blur_paths.append(path)
 
-    class_0_paths = sharp_paths + bokeh_paths + eval_sharp_paths
+    class_0_paths = sharp_paths + kaggle_sharp_paths + bokeh_paths + eval_sharp_paths
     class_0_labels = [0] * len(class_0_paths)
 
     blur_nat_paths = sorted(
@@ -29,9 +30,18 @@ def prepare_dataset(base_dir):
     blur_art_paths = sorted(
         glob.glob(f"{base_dir}/CERTH/TrainingSet/Artificially-Blurred/*.*")
     )
+    defocused_paths = sorted(glob.glob(f"{base_dir}/Kaggle/defocused_blurred/*.*"))
+    motion_blur_kaggle = sorted(glob.glob(f"{base_dir}/Kaggle/motion_blurred/*.*"))
     motion_blur = sorted(glob.glob(f"{base_dir}/CUHK/blurred/*.*"))
 
-    class_1_paths = blur_nat_paths + blur_art_paths + eval_blur_paths + motion_blur
+    class_1_paths = (
+        blur_nat_paths
+        + blur_art_paths
+        + eval_blur_paths
+        + defocused_paths
+        + motion_blur_kaggle
+        + motion_blur
+    )
     class_1_labels = [1] * len(class_1_paths)
 
     all_paths = class_0_paths + class_1_paths
