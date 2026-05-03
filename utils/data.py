@@ -1,10 +1,12 @@
 import glob
 import os
+import random
 
 
 def prepare_dataset(base_dir):
+    random.seed(42)
+
     sharp_paths = sorted(glob.glob(f"{base_dir}/CERTH/TrainingSet/Undistorted/*.*"))
-    kaggle_sharp_paths = sorted(glob.glob(f"{base_dir}/Kaggle/sharp/*.*"))
     bokeh_paths = sorted(glob.glob(f"{base_dir}/CUHK/sharp/*.*"))
 
     all_eval_dig_paths = sorted(
@@ -21,7 +23,17 @@ def prepare_dataset(base_dir):
         else:
             eval_blur_paths.append(path)
 
-    class_0_paths = sharp_paths + kaggle_sharp_paths + bokeh_paths + eval_sharp_paths
+    ebb_bokeh_paths = sorted(glob.glob(f"{base_dir}/EBB/train/bokeh/*.*"))
+    ebb_orig_paths = sorted(glob.glob(f"{base_dir}/EBB/train/original/*.*"))
+
+    ebb_pairs = list(zip(ebb_bokeh_paths, ebb_orig_paths))
+
+    sample_size = min(500, len(ebb_pairs))
+    sampled_pairs = random.sample(ebb_pairs, sample_size)
+
+    ebb_sampled_paths = [path for pair in sampled_pairs for path in pair]
+
+    class_0_paths = sharp_paths + bokeh_paths + eval_sharp_paths + ebb_sampled_paths
     class_0_labels = [0] * len(class_0_paths)
 
     blur_nat_paths = sorted(

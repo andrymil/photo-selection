@@ -13,7 +13,7 @@ from utils.model import get_efficientnet, get_val_transforms
 from utils.path import calculate_path
 
 IMAGE_SIZE = 384
-EXPERIMENT_NAME = "EfficientNetV2S_384px_batch16_with_kaggle_BEST"
+EXPERIMENT_NAME = "EfficientNetV2S_384px_batch16_with_EBB_BEST"
 BASE_DIR = "datasets"
 ERROR_DIR = calculate_path(__file__, "error_analysis")
 
