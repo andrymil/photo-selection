@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "black[jupyter]>=26.3.1",
     "datasets>=4.7.0",
+    "grad-cam>=1.5.5",
     "imbalanced-learn>=0.14.1",
     "ipympl>=0.10.0",
     "jupyterlab>=4.5.6",
