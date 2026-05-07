@@ -15,7 +15,7 @@ from utils.path import calculate_path
 from utils.model import get_efficientnet, get_val_transforms
 
 IMAGE_SIZE = 384
-EXPERIMENT = "EfficientNetV2S_384px_batch16_without_NaturalBlur_BEST"
+EXPERIMENT = "EfficientNetV2S_384px_batch16_with_EBB_BEST"
 BASE_DIR = "datasets"
 
 
@@ -96,9 +96,8 @@ def main():
     plt.xlabel("Decision Threshold", fontsize=13)
     plt.ylabel("Score", fontsize=13)
     plt.xlim(0.0, 1.0)
-    plt.ylim(0.0, 1.05)
+    plt.ylim(0.8, 1.05)
     plt.xticks(np.arange(0, 1.05, 0.1))
-    plt.yticks(np.arange(0, 1.05, 0.1))
     plt.legend(loc="lower center", fontsize=11)
 
     plt.tight_layout()

@@ -13,7 +13,7 @@ from utils.path import calculate_path
 from utils.model import get_efficientnet, get_val_transforms, predict_ai
 
 IMAGE_SIZE = 384
-EXPERIMENT = "EfficientNetV2S_384px_batch16_without_NaturalBlur_BEST"
+EXPERIMENT = "EfficientNetV2S_384px_batch16_with_EBB_BEST"
 BASE_DIR = "datasets"
 
 
