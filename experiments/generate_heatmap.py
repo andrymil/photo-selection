@@ -11,7 +11,7 @@ from pytorch_grad_cam.utils.image import show_cam_on_image
 
 IMAGE_SIZE = 384
 EXPERIMENT = "EfficientNetV2S_384px_batch16_with_EBB_BEST"
-TEST_IMAGE_PATH = "datasets/CUHK/sharp/out_of_focus0245.jpg"
+TEST_IMAGE_PATH = "datasets/CUHK/blurred/motion0284.jpg"
 
 
 def main():
