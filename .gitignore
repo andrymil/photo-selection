@@ -16,4 +16,4 @@ models/checkpoints/
 *.pth
 *.pt
 *.h5
-*.onnx
+*.onnx*
