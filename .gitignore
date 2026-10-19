@@ -11,7 +11,8 @@ wheels/
 
 datasets/
 datasets_roi/
-models/checkpoints/
+artifacts/
+results/sharpness/error_analysis/
 
 *.pth
 *.pt
