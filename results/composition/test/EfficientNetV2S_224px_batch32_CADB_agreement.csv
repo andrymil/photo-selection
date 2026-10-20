@@ -1,0 +1,9 @@
+name,srcc,ci_low,ci_high
+"SAMP-Net (Zhang et al., 2021)",0.6564,,
+Ours,0.6978878812728289,0.660068214456984,0.7314673084142569
+Ours vs mean of 4 raters (average),0.6905823679152627,,
+Rater 1 vs mean of others,0.8277645765126237,,
+Rater 2 vs mean of others,0.6567421084731484,,
+Rater 3 vs mean of others,0.6164534758154292,,
+Rater 4 vs mean of others,0.8453608522427272,,
+Rater 5 vs mean of others,0.8255606575522088,,

@@ -20,7 +20,15 @@ CADB_DIR = DATASETS_DIR / "CADB" / "CADB_Dataset"
 IMAGES_DIR = CADB_DIR / "images"
 SCORES_PATH = CADB_DIR / "composition_scores.json"
 SPLIT_PATH = CADB_DIR / "split.json"
+SCENES_PATH = CADB_DIR / "scene_categories.json"
 
 CHECKPOINTS_DIR = ARTIFACTS_DIR / "composition" / "checkpoints"
 BEST_CHECKPOINT = CHECKPOINTS_DIR / f"{EXPERIMENT_NAME}_BEST.pth"
 TRAINING_RESULTS_DIR = RESULTS_DIR / "composition" / "training"
+TEST_RESULTS_DIR = RESULTS_DIR / "composition" / "test"
+
+GALLERY_SIZE = 6
+
+# Zhang et al., "Image Composition Assessment with Saliency-augmented
+# Multi-pattern Pooling", BMVC 2021, Table 2 (CADB test set).
+SAMP_NET_RESULTS = {"srcc": 0.6564, "plcc": 0.6709, "mse": 0.3867}
