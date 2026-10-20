@@ -1,0 +1,3 @@
+method,mse,srcc,plcc,accuracy
+EfficientNetV2-S (ours),0.372516006231308,0.6978878812728289,0.699928343296051,0.78
+"SAMP-Net (Zhang et al., 2021)",0.3867,0.6564,0.6709,
