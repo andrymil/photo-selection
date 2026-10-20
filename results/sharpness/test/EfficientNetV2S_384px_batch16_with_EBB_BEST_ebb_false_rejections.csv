@@ -1,0 +1,7 @@
+dataset,images,method,threshold,false_rejection_rate
+EBB validation original,200,EfficientNetV2-S,0.5,0.005
+EBB validation original,200,EfficientNetV2-S,0.75,0.005
+EBB validation original,200,Laplacian variance,90.0,0.425
+EBB validation bokeh,200,EfficientNetV2-S,0.5,0.01
+EBB validation bokeh,200,EfficientNetV2-S,0.75,0.0
+EBB validation bokeh,200,Laplacian variance,90.0,0.875

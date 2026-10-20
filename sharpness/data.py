@@ -2,6 +2,7 @@ import glob
 import os
 import random
 
+import pandas as pd
 from PIL import Image
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset
@@ -109,3 +110,22 @@ def load_val_set(base_dir=DATASETS_DIR):
     _, val_paths, _, val_labels = split_dataset(paths, labels)
 
     return val_paths, val_labels
+
+
+def load_certh_natural_blur(base_dir=DATASETS_DIR):
+    eval_dir = f"{base_dir}/CERTH/EvaluationSet"
+    labels_df = pd.read_excel(f"{eval_dir}/NaturalBlurSet.xlsx")
+
+    paths = [
+        f"{eval_dir}/NaturalBlurSet/{name}.jpg" for name in labels_df["Image Name"]
+    ]
+    labels = [1 if label == 1 else 0 for label in labels_df["Blur Label"]]
+
+    return paths, labels
+
+
+def load_ebb_validation(base_dir=DATASETS_DIR):
+    original_paths = sorted(glob.glob(f"{base_dir}/EBB/validation/original/*.*"))
+    bokeh_paths = sorted(glob.glob(f"{base_dir}/EBB/validation/bokeh/*.*"))
+
+    return original_paths, bokeh_paths

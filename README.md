@@ -54,13 +54,17 @@ uv run python -m sharpness.tools.export_to_onnx
 
 ## Results
 
-Blur detection, EfficientNetV2-S (384px), validation split:
+Blur detection, EfficientNetV2-S (384px, threshold 0.5) compared with Laplacian variance (threshold tuned on the validation split):
 
-| Accuracy | Precision | Recall | F1-Score |
-|---|---|---|---|
-| 0.971 | 0.975 | 0.950 | 0.962 |
+| Dataset | Method | Accuracy | Precision | Recall | F1-Score | ROC AUC |
+|---|---|---|---|---|---|---|
+| Validation split | EfficientNetV2-S | 0.971 | 0.975 | 0.950 | 0.962 | 0.993 |
+| CERTH NaturalBlurSet (test, training duplicates removed) | EfficientNetV2-S | 0.836 | 0.906 | 0.686 | 0.780 | 0.911 |
+| CERTH NaturalBlurSet (test, training duplicates removed) | Laplacian variance | 0.722 | 0.624 | 0.875 | 0.728 | 0.861 |
 
-Plots and per-experiment metrics are in `results/sharpness/`.
+Sharp photos wrongly rejected on the EBB! validation set: EfficientNetV2-S 0.5% (regular) / 1.0% (bokeh), Laplacian variance 42.5% / 87.5%.
+
+Plots and per-experiment metrics are in `results/sharpness/` (`test/` for the independent test sets).
 
 ## Tech Stack
 

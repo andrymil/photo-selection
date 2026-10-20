@@ -1,10 +1,23 @@
 import cv2
 import numpy as np
+from PIL import Image
 
 
 def get_laplacian_score(img_cv2):
     gray = cv2.cvtColor(img_cv2, cv2.COLOR_BGR2GRAY)
     return cv2.Laplacian(gray, cv2.CV_64F).var()
+
+
+def get_difference_hash(image_path, hash_size=8):
+    image = Image.open(image_path)
+    image.draft("L", (hash_size * 16, hash_size * 16))
+
+    pixels = np.asarray(
+        image.convert("L").resize((hash_size + 1, hash_size), Image.Resampling.LANCZOS),
+        dtype=np.int16,
+    )
+
+    return (pixels[:, 1:] > pixels[:, :-1]).ravel()
 
 
 def get_largest_bbox(yolo_results, image_shape):
